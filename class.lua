@@ -1,50 +1,64 @@
 -- localize globals
 
-local assert = assert;
-local type = type;
-local setmetatable = setmetatable;
-local getfenv = getfenv;
+local assert = assert
+local type = type
+local setmetatable = setmetatable
+local getfenv = getfenv
 
 -- create class functions
 
 local error_codes = {
-     ["INVALID_ARGUMENT"] = "Expected type %s type for %s got %s";
-     ["INVALID_CLASSNAME"] = "%s is not a valid class name";
+    ["INVALID_ARGUMENT"] = "Expected type %s type for %s got %s",
+    ["INVALID_CLASSNAME"] = "%s is not a valid class name"
 }
 
 local classes = {}
 
-local function class(class_name)
-    assert(type(class_name) == "string", error_codes["INVALID_ARGUMENT"]:format("string", "class name", type(class_name))
+local call_function = function(self, ...)
+     if (self.constructor) then
+          return self.constructor(...)
+     end
+end
 
-    return function(class_data)
-        classes[class_name] = class_data
-    end
+local construction_function = function(...)
+     getfenv()["self"] = object
+
+     constructor(...)
+
+     return object
+end
+
+local class_function = function(class_data)
+     classes[class_name] = class_data
+end
+
+local function class(class_name)
+    assert(type(class_name) == "string",
+          error_codes["INVALID_ARGUMENT"]:format("string", "class name", type(class_name))
+    )
+
+    return class_function
 end
 
 local function new(class_name)
     local class = classes[class_name]
-    assert(class, error_codes["INVALID_CLASSNAME"]:format(class_name)
+    assert(class, error_codes["INVALID_CLASSNAME"]:format(class_name))
 
-    local object = setmetatable({}, {
-        __index = class,
-        __call = function(self, ...)
-            if (self.constructor) then
-                return self.constructor(...)
-            end
-        end
-    })
+    local object =
+        setmetatable({},
+        {
+            __index = class,
+            __call = call_function
+        }
+    )
 
-    local constructor = object.constructor
-    if (constructor) then
-        assert(type(constructor) == "function", error_codes["INVALID_ARGUMENT"]:format("function", "constructor", type(constructor))
+    local constructor = object.constructor do
+        if (constructor) then
+            assert(type(constructor) == "function",
+                error_codes["INVALID_ARGUMENT"]:format("function", "constructor", type(constructor))
+            )
 
-        object.constructor = function(...)
-            getfenv()["self"] = object
-
-            constructor(...)
-
-            return object
+            object.constructor = construction_function;
         end
     end
 
