@@ -15,29 +15,19 @@ local error_codes = {
 local classes = {}
 
 local call_function = function(self, ...)
-     if (self.constructor) then
-          return self.constructor(...)
-     end
-end
-
-local construction_function = function(...)
-     getfenv()["self"] = object
-
-     constructor(...)
-
-     return object
-end
-
-local class_function = function(class_data)
-     classes[class_name] = class_data
+    if (self.constructor) then
+        return self.constructor(...)
+    end
 end
 
 local function class(class_name)
     assert(type(class_name) == "string",
-          error_codes["INVALID_ARGUMENT"]:format("string", "class name", type(class_name))
+        error_codes["INVALID_ARGUMENT"]:format("string", "class name", type(class_name))
     )
 
-    return class_function
+    return function(class_data)
+        classes[class_name] = class_data
+    end
 end
 
 local function new(class_name)
@@ -45,7 +35,8 @@ local function new(class_name)
     assert(class, error_codes["INVALID_CLASSNAME"]:format(class_name))
 
     local object =
-        setmetatable({},
+        setmetatable(
+        {},
         {
             __index = class,
             __call = call_function
@@ -58,7 +49,13 @@ local function new(class_name)
                 error_codes["INVALID_ARGUMENT"]:format("function", "constructor", type(constructor))
             )
 
-            object.constructor = construction_function;
+            object.constructor = function(...)
+                getfenv()["self"] = object
+
+                constructor(...)
+
+                return object
+            end
         end
     end
 
