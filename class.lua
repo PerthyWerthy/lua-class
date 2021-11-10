@@ -11,6 +11,7 @@ local error_codes = {
      ["INVALID_ARGUMENT"] = "Expected type %s type for %s got %s";
      ["INVALID_CLASSNAME"] = "%s is not a valid class name";
 }
+
 local classes = {}
 
 local function class(class_name)
