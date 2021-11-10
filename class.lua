@@ -7,10 +7,13 @@ local getfenv = getfenv;
 
 -- create class functions
 
+local error_codes = {
+     ["INVALID_ARGUMENT"] = "Expected type %s type for %s got %s"
+}
 local classes = {}
 
 local function class(class_name)
-    assert(type(class_name) == "string", "Expected type string for class name, got " .. type(class_name))
+    assert(type(class_name) == "string", error_codes["INVALID_ARGUMENT"]:format("string", "class name", type(class_name))
 
     return function(class_data)
         classes[class_name] = class_data
