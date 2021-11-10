@@ -8,7 +8,8 @@ local getfenv = getfenv;
 -- create class functions
 
 local error_codes = {
-     ["INVALID_ARGUMENT"] = "Expected type %s type for %s got %s"
+     ["INVALID_ARGUMENT"] = "Expected type %s type for %s got %s";
+     ["INVALID_CLASSNAME"] = "%s is not a valid class name";
 }
 local classes = {}
 
@@ -22,7 +23,7 @@ end
 
 local function new(class_name)
     local class = classes[class_name]
-    assert(class, class_name .. " is not a valid class name")
+    assert(class, error_codes["INVALID_CLASSNAME"]:format(class_name)
 
     local object = setmetatable({}, {
         __index = class,
@@ -35,7 +36,7 @@ local function new(class_name)
 
     local constructor = object.constructor
     if (constructor) then
-        assert(type(constructor) == "function", "Expected type function for constructor, got " .. type(constructor))
+        assert(type(constructor) == "function", error_codes["INVALID_ARGUMENT"]:format("function", "constructor", type(constructor))
 
         object.constructor = function(...)
             getfenv()["self"] = object
