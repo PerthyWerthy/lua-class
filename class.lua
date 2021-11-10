@@ -1,16 +1,18 @@
 -- localize globals
 
-local assert = assert
-local type = type
-local setmetatable = setmetatable
-local getfenv = getfenv
+local assert       = assert;
+local type         = type;
+local setmetatable = setmetatable;
+local getfenv      = getfenv;
 
--- create class functions
+-- create error codes
 
 local error_codes = {
-    ["INVALID_ARGUMENT"] = "Expected type %s type for %s got %s",
+    ["INVALID_ARGUMENT"]  = "Expected type %s type for %s got %s",
     ["INVALID_CLASSNAME"] = "%s is not a valid class name"
 }
+
+-- create class functions
 
 local classes = {}
 
